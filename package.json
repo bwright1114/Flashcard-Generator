@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/bwright1114/Flashcard-Generator#readme",
   "dependencies": {
+    "colors": "^1.1.2",
     "init": "^0.1.2",
-    "inquirer": "^3.0.6"
+    "inquirer": "^3.0.6",
+    "require": "^2.4.20"
   }
 }
