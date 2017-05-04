@@ -12,19 +12,19 @@ var count = 0;
 //initially give option to the user to Create new flashcards or use exiting ones.
 function openMenu() {
 //use inquirer to ask question    
-  inquirer.prompt([															
+  inquirer.prompt([                                                         
       {
 //type list gives user a list of options        
-          type: "list",	
-//message shown to the user          													
+          type: "list", 
+//message shown to the user                                                             
           message: "\nPlease choose a menu option from the list below?",
-//options that show in list          	
-          choices: ["Create New Card", "Use Existing Cards", "Exit"],	
+//options that show in list             
+          choices: ["Create New Card", "Use Existing Cards", "Exit"],   
 //refrence name of object          
-          name: "menuOptions"												
+          name: "menuOptions"                                               
       }
 //Once inquirer gets answer then...      
-  ]).then(function (answer) {												
+  ]).then(function (answer) {                                               
     
 
     switch (answer.menuOptions) {
@@ -68,8 +68,8 @@ function createCard() {
 
     ]).then(function (appData) {
 //the variable cardType will store the choice from the cardType inquirer object.
-        var cardType = appData.cardType;  			
-        console.log(cardType);			  			
+        var cardType = appData.cardType;            
+        console.log(cardType);                      
 
         if (cardType === "Basic Card") {
             inquirer.prompt([
@@ -87,18 +87,18 @@ function createCard() {
 
             ]).then(function (cardData) {
 //builds an object with front and back info
-                var cardObj = {						
+                var cardObj = {                     
                     type: "BasicCard",
                     front: cardData.front,
                     back: cardData.back
                 };
 //push the new card into the array of cards                
                 library.push(cardObj);
-//write the updated array to the carLibrary.json file                				
+//write the updated array to the carLibrary.json file                               
                 fs.writeFile("cardLibrary.json", JSON.stringify(library, null, 2)); 
 
 //use inquirer to ask if the user wants to keep making cards
-                inquirer.prompt([					
+                inquirer.prompt([                   
                     {
                         type: "list",
                         message: "Do you want to create another card?",
@@ -106,16 +106,16 @@ function createCard() {
                         name: "anotherCard"
                     }
 //once the user gives answer....
-                ]).then(function (appData) {				
-                    if (appData.anotherCard === "Yes") {	
-                        createCard();						
-                    } else {								
-                        openMenu();			
+                ]).then(function (appData) {                
+                    if (appData.anotherCard === "Yes") {    
+                        createCard();                       
+                    } else {                                
+                        openMenu();         
                     }
                 });
             });
 //Else (if the answer isn't Basic it had to be Cloze)
-        } else {						
+        } else {                        
             inquirer.prompt([
                 {
                     type: "input",
@@ -131,22 +131,22 @@ function createCard() {
 
             ]).then(function (cardData) {            
 
-                var cardObj = {						
+                var cardObj = {                     
                     type: "ClozeCard",
                     text: cardData.text,
                     cloze: cardData.cloze
                 };
                 if (cardObj.text.indexOf(cardObj.cloze) !== -1) {   
 //push the new card into the array of cards                    
-                    library.push(cardObj);							
+                    library.push(cardObj);                          
 //write the updated array to the cardLibrary file                    
                     fs.writeFile("cardLibrary.json", JSON.stringify(library, null, 2)); 
-                } else {											
+                } else {                                            
                     console.log("The cloze must match word or words in the statement.");
 
                 }
 //use inquirer to ask if the user wants to keep making cards                
-                inquirer.prompt([					
+                inquirer.prompt([                   
                     {
                         type: "list",
                         message: "Do you want to create another card?",
@@ -154,11 +154,11 @@ function createCard() {
                         name: "anotherCard"
                     }
 
-                ]).then(function (appData) {				
-                    if (appData.anotherCard === "Yes") {	
-                        createCard();						
-                    } else {								
-                        openMenu();		
+                ]).then(function(appData) {                
+                    if (appData.anotherCard === "Yes") {    
+                        createCard();                       
+                    } else {                                
+                        openMenu();     
                     }
                 });
             });
@@ -169,15 +169,15 @@ function createCard() {
 
 //function used to get the question from the drawnCard in the askQuestions function
 function getQuestion(card) {
-    if (card.type === "BasicCard") {						
+    if (card.type === "BasicCard") {                        
 //drawnCard becomes a new instance of BasicCard constuctor with its front and back passed in        
-        drawnCard = new BasicCard(card.front, card.back);	
-        return drawnCard.front;	
-    } else if (card.type === "ClozeCard") {	
-//drawnCard becomes a new instance of ClozeCard constuctor with its text and cloze passed in    				
-        drawnCard = new ClozeCard(card.text, card.cloze)	
+        drawnCard = new BasicCard(card.front, card.back);   
+        return drawnCard.front; 
+    } else if (card.type === "ClozeCard") { 
+//drawnCard becomes a new instance of ClozeCard constuctor with its text and cloze passed in                    
+        drawnCard = new ClozeCard(card.text, card.cloze)    
 //Return the ClozeCard prototpe method clozeRemoved to show the question missing the cloze        
-        return drawnCard.clozeRemoved();					
+        return drawnCard.clozeRemoved();                    
     }
 };
 
@@ -185,16 +185,16 @@ function getQuestion(card) {
 function askQuestions() {
 //if current count (starts at 0) is less than the number of cards in the library....    
     if (count < library.length) {
-//playedCard stores the question from the card with index equal to the current counter.    					
-        playedCard = getQuestion(library[count]);	
-        inquirer.prompt([							
+//playedCard stores the question from the card with index equal to the current counter.                     
+        playedCard = getQuestion(library[count]);   
+        inquirer.prompt([                           
             {
                 type: "input",
                 message: playedCard,
                 name: "question"
             }
 //once the user answers            
-        ]).then(function (answer) {					
+        ]).then(function(answer) {                 
 //if the users answer equals .back or .cloze of the playedCard run a message "You are correct."
             if (answer.question === library[count].back || answer.question === library[count].cloze) {
                 console.log(colors.blue("You are correct."));
@@ -209,14 +209,13 @@ function askQuestions() {
             }
 //increase the counter for the next run through            
             count++; 
-//recursion. call the function within the function to keep it running. It will stop when counter=library.length            		
+//recursion. call the function within the function to keep it running. It will stop when counter=library.length                 
             askQuestions(); 
         });
     } else {
 //reset counter to 0 once loop ends        
-      	count=0;
+        count=0;
 
-      	openMenu();			//call the menu for the user to continue using the app
+        openMenu();         //call the menu for the user to continue using the app
     }
 };
-

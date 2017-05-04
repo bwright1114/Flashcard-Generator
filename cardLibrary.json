@@ -26,7 +26,7 @@
   },
   {
     "type": "BasicCard",
-    "text": "In the movie Frozen, which song does Elsa sing as she builds the castle?",
+    "front": "In the movie Frozen, which song does Elsa sing as she builds the castle?",
     "back": "Let It Go"
   },
   {
