@@ -47,7 +47,7 @@ function openMenu() {
 
         default:
             console.log("");
-            console.log("Sorry I don't understand");
+            console.log("Sorry I don't understand yoour request");
             console.log("");
     }
 
