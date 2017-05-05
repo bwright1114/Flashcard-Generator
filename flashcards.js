@@ -1,11 +1,11 @@
-const inquirer = require("inquirer");
-const library = require("./cardLibrary.json");
-const BasicCard = require("./BasicCard.js")
-const ClozeCard = require("./ClozeCard.js")
-const colors = require('colors');
-const fs = require("fs");
+var inquirer = require("inquirer");
+var library = require("./cardLibrary.json");
+var BasicCard = require("./BasicCard.js")
+var ClozeCard = require("./ClozeCard.js")
+var colors = require('colors');
+var fs = require("fs");
 
-var drawnCard;
+var libCard;
 var playedCard;
 var count = 0;
 
@@ -67,7 +67,7 @@ function createCard() {
         }
 
     ]).then(function (appData) {
-//the variable cardType will store the choice from the cardType inquirer object.
+//the variable cardType will store the choice from the name: cardType object.
         var cardType = appData.cardType;            
         console.log(cardType);                      
 
@@ -78,7 +78,6 @@ function createCard() {
                     message: "Front of your card (Your Question).",
                     name: "front"
                 },
-
                 {
                     type: "input",
                     message: "Back of your card (Your Answer).",
@@ -86,14 +85,14 @@ function createCard() {
                 }
 
             ]).then(function (cardData) {
-//builds an object with front and back info
-                var cardObj = {                     
+//cardobject with front and back info
+                var cardObject = {                     
                     type: "BasicCard",
                     front: cardData.front,
                     back: cardData.back
                 };
 //push the new card into the array of cards                
-                library.push(cardObj);
+                library.push(cardObject);
 //write the updated array to the carLibrary.json file                               
                 fs.writeFile("cardLibrary.json", JSON.stringify(library, null, 2)); 
 
@@ -122,34 +121,31 @@ function createCard() {
                     message: "Write full text of your statement.",
                     name: "text"
                 },
-
                 {
                     type: "input",
                     message: "Remove part of sentence you want to cloze out, (replacing with '...'.)",
                     name: "cloze"
                 }
-
             ]).then(function (cardData) {            
 
-                var cardObj = {                     
+                var cardObject = {                     
                     type: "ClozeCard",
                     text: cardData.text,
                     cloze: cardData.cloze
                 };
-                if (cardObj.text.indexOf(cardObj.cloze) !== -1) {   
-//push the new card into the array of cards                    
-                    library.push(cardObj);                          
-//write the updated array to the cardLibrary file                    
+                if (cardObject.text.indexOf(cardObject.cloze) !== -1) {   
+//push the new card into Library                   
+                    library.push(cardObject);                          
+//write the updated array to the cardLibrary                    
                     fs.writeFile("cardLibrary.json", JSON.stringify(library, null, 2)); 
                 } else {                                            
-                    console.log("The cloze must match word or words in the statement.");
-
+                    console.log("The cloze must match word or words in the sentence.");
                 }
-//use inquirer to ask if the user wants to keep making cards                
+//use inquirer to ask if the user wants to make another card
                 inquirer.prompt([                   
                     {
                         type: "list",
-                        message: "Do you want to create another card?",
+                        message: "Do you want to make another card?",
                         choices: ["Yes", "No"],
                         name: "anotherCard"
                     }
@@ -167,55 +163,49 @@ function createCard() {
     });
 };
 
-//function used to get the question from the drawnCard in the askQuestions function
+//function used to get the questions from the cardLbrary that are already existing 
 function getQuestion(card) {
     if (card.type === "BasicCard") {                        
-//drawnCard becomes a new instance of BasicCard constuctor with its front and back passed in        
-        drawnCard = new BasicCard(card.front, card.back);   
-        return drawnCard.front; 
+//libCard becomes a new card of BasicCard constuctor 
+        libCard = new BasicCard(card.front, card.back);   
+        return libCard.front; 
     } else if (card.type === "ClozeCard") { 
-//drawnCard becomes a new instance of ClozeCard constuctor with its text and cloze passed in                    
-        drawnCard = new ClozeCard(card.text, card.cloze)    
-//Return the ClozeCard prototpe method clozeRemoved to show the question missing the cloze        
-        return drawnCard.clozeRemoved();                    
+//libCard becomes a new card of ClozeCard constuctor                    
+        libCard = new ClozeCard(card.text, card.cloze)         
+        return libCard.clozeRemoved();                    
     }
 };
 
 //function to ask questions from all stored card in the library
 function askQuestions() {
 //if current count (starts at 0) is less than the number of cards in the library....    
-    if (count < library.length) {
-//playedCard stores the question from the card with index equal to the current counter.                     
+    if (count < library.length) {                    
         playedCard = getQuestion(library[count]);   
         inquirer.prompt([                           
             {
                 type: "input",
                 message: playedCard,
                 name: "question"
-            }
-//once the user answers            
+            }           
         ]).then(function(answer) {                 
-//if the users answer equals .back or .cloze of the playedCard run a message "You are correct."
+//if the users answer equals .back or .cloze show message
             if (answer.question === library[count].back || answer.question === library[count].cloze) {
-                console.log(colors.blue("You are correct."));
+                console.log(colors.blue("You are correct!!"));
             } else {
-//check to see if current card is Cloze or Basic
-                if (drawnCard.front !== undefined) { 
-                    console.log(colors.magenta("Sorry, the correct answer was ") + library[count].back + "."); 
-                } else { 
-//grabs & shows correct answer                    
-                    console.log(colors.magenta("Sorry, the correct answer was ") + library[count].cloze + ".");
+//checks if current card is Cloze or Basic
+                if (libCard.front !== undefined) { 
+                    console.log(colors.magenta("Sorry, the correct answer is ") + library[count].back + "."); 
+                } else {                   
+                    console.log(colors.magenta("Sorry, the correct answer is ") + library[count].cloze + ".");
                 }
-            }
-//increase the counter for the next run through            
+            }          
             count++; 
-//recursion. call the function within the function to keep it running. It will stop when counter=library.length                 
+//recursion call the function within the function to keep it running. 
             askQuestions(); 
         });
     } else {
 //reset counter to 0 once loop ends        
         count=0;
-
-        openMenu();         //call the menu for the user to continue using the app
+        openMenu();        
     }
 };

@@ -8,7 +8,7 @@ function ClozeCard(text, cloze) {
 function ClozeCardProtype() {
 
 	this.clozeRemoved = function() {
-		//templete literal enclosed by the back-tick ` allows embedded expressions wrapped with ${}
+//templete literal enclosed by the back-tick (read about this on Slack seems to be working for now.)
 		return `${this.text[0]} ... ${this.text[1]}`
 	};
 };
